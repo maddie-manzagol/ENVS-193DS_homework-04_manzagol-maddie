@@ -74,7 +74,7 @@ model_squares
 ```
 
 
-```{r Anova-summary-table}
+```{r}
 model_squares_table <- tidy(model_squares) %>% 
   mutate(across(sumsq:meansq,~round(.x, digits = 5))) %>% 
   mutate(statistic = round(statistic, digits = 1)) %>% 
