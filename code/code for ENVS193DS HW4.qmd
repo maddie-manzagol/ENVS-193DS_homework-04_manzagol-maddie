@@ -4,8 +4,39 @@ author: Maddie Manzagol
 data: May 20, 2023
 format: docx
 ---
+#Question: How does fish length predict fish weight for trout perch (across all sample years)? 
+```{r loading-in-packages}
+library(tidyverse)
+library(here)
+library(lterdatasampler)
+library(naniar)
+```
 
+```{r set-up-data-using-here-package}
+fishdata <- read_csv(here::here("data", "ntl6_v12.csv"))
+```
+
+#Problem 1
+1. Null and alternative hypotheses in mathematical and biological terms
+
+Mathematical: HO: μ = 0; HA: μ ≠ 0 
+
+Biological: The null hypothesis will be "fish length does not predict fish weight for trout perch"; meanwhile, the alternative hypothesis will be "fish length does predict fish weight for trout perch"
+
+2. Create a visualization of the missing data for the filtered data set containing the observations you will use and also write an accompanying caption explaining how/if the missing data is relevant to your hypotheses. 
+
+```{r filtering-data-set}
+fish_summary <- subset(fishdata, select = c(length, weight))
+```
+
+```{r visualize-missing-data}
+gg_miss_var(fish_summary)
+```
+
+The missing data shown from the gg_miss_var plot highlights a substantial amount of missing data for fish weight. This will be important to note because our statistical question is asking if fish length predicts fish weight; however, if a lot of data is missing for fish weight then it will likely be difficult to accurately determine a relationship between fish length and fish weight.
+
+3. Run your test (Linear regression test)
 ```{r}
-
+fishlinearregression <- lm(weight~length, data= fish_summary)
 ```
 
