@@ -100,6 +100,9 @@ The ANOVA table relates to the information you get from the summary object becau
 
 9. In 2-3 sentences, summarize your results in prose with in-text references to test results. Include all relevant information.
 
+Given that we hypothesized that fish length would predict fish weights, our null hypothesis was that fish length did not predict fish weight. Fish weight was significantly predicted by differing fish lengths (analysis of variance, F(1, 91,088) = 136,700.2, p < 0.001,𝞪= 0.05).
+
+
 
 10. Create a visualization with model predictions and confidence intervals on top of the underlying data. Finalize your plot.
 a. Write an accompanying caption
