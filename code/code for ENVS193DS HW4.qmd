@@ -10,6 +10,11 @@ library(tidyverse)
 library(here)
 library(lterdatasampler)
 library(naniar)
+library(performance)
+library(broom)
+library(flextable)
+library(ggeffects)
+library(car)
 ```
 
 ```{r set-up-data-using-here-package}
@@ -19,7 +24,7 @@ fishdata <- read_csv(here::here("data", "ntl6_v12.csv"))
 #Problem 1
 1. Null and alternative hypotheses in mathematical and biological terms
 
-Mathematical: HO: μ = 0; HA: μ ≠ 0 
+Mathematical: HO: β = 0; HA: β ≠ 0 
 
 Biological: The null hypothesis will be "fish length does not predict fish weight for trout perch"; meanwhile, the alternative hypothesis will be "fish length does predict fish weight for trout perch"
 
@@ -38,5 +43,94 @@ The missing data shown from the gg_miss_var plot highlights a substantial amount
 3. Run your test (Linear regression test)
 ```{r}
 fishlinearregression <- lm(weight~length, data= fish_summary)
+
+# makes the viewer pane show a 2x2 grid of plots
+# format: par(mfrow = c(number of rows, number of columns))
+par(mfrow = c(2, 2))
+plot(fishlinearregression)
 ```
+
+plot 1--Residual vs Fitted: The residual vs fitted plot generated from "fishlinearregression" shows residuals that are not evenly and randomly distributed around the horizontal dotted line. Therefore, the assumption of homoscedasticity is violated. 
+
+plot 2--Normal QQ: The normal QQ plot shows residuals that are not entirely linearly distributed, meaning the points do not follow a straight line. There is a portion distributed between quantiles -2 to 2 that follow a very linear line but after quantile 2 the slope changes. 
+
+plot 3--Scale-Location: The scale-location plot highlights that the square root of residuals does not highlight an even and random spread around the red line. This means that the variances change and homoscedasticity is violated. 
+
+plot 4--Residual vs Leverage: The residual vs leverage plot highlights some outliers (labeled) indicating that there are data points that are influencing the model. This means that if the model was calculated without these labeled outliers, then the model would predict a different estimate. 
+
+
+6.
+```{r results-summary}
+model_summary <- summary(fishlinearregression)
+
+model_summary
+```
+
+7. 
+```{r Anova-summary}
+model_squares <- anova(fishlinearregression)
+
+model_squares
+```
+
+
+```{r Anova-summary-table}
+model_squares_table <- tidy(model_squares) %>% 
+  mutate(across(sumsq:meansq,~round(.x, digits = 5))) %>% 
+  mutate(statistic = round(statistic, digits = 1)) %>% 
+  mutate(p.value = case_when(p.value < 0.001~"<0.001")) %>% 
+  mutate(term = case_when(term == "stem_length" ~ "Stem length (mm)",
+    TRUE ~ term
+  )) %>% 
+  # make the data frame a flextable object
+  flextable() %>% 
+  # change the header labels to be meaningful
+  set_header_labels(df = "Degrees of Freedom", 
+                    sumsq = "Sum of squares",
+                    meansq = "Mean squares",
+                    statistic = "F-statistic",
+                    p.value = "p-value")
+
+model_squares_table
+```
+
+8. In 1-2 sentences, describe how the ANOVA table relates to the information you get from the summary() object. 
+
+The ANOVA table relates to the information you get from the summary object because both report f-statistic, the degrees of freedom, and the p-value. 
+
+9. In 2-3 sentences, summarize your results in prose with in-text references to test results. Include all relevant information.
+
+
+10. Create a visualization with model predictions and confidence intervals on top of the underlying data. Finalize your plot.
+a. Write an accompanying caption
+
+```{r}
+# extract model predictions using ggpredict
+predictions <- ggpredict(fishlinearregression, terms = "length")
+
+predictions
+
+plot_predictions <- ggplot(data = fish_summary, 
+                           aes(x = length, y = weight)) +
+  # first plot the underlying data from fish_summary
+  geom_point() +
+  # then plot the predictions
+  geom_line(data = predictions, 
+            aes(x = x, y = predicted), 
+            color = "blue", linewidth = 1) +
+  # then plot the 95% confidence interval from ggpredict
+  geom_ribbon(data = predictions, 
+              aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
+              alpha = 0.2) +
+  # theme and meaningful labels
+  theme_bw() +
+  labs(x = "Fish Length",
+       y = "Fish Weight")
+
+plot_predictions
+```
+
+a. The figure above plot fish weight prediction as a function of fish length using data collected about perch trout located in the North Temperate Lakes from 1981 to present day. The data points represent the predicted fish weight given a fish length; meanwhile, the blue line indicates the overall trendline for the predicted correlation between fish length and fish weight. 
+
+
 
