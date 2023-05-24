@@ -6,6 +6,7 @@ format: docx
 ---
 #Question: How does fish length predict fish weight for trout perch (across all sample years)? 
 ```{r loading-in-packages}
+#load in packages
 library(tidyverse)
 library(here)
 library(lterdatasampler)
@@ -18,6 +19,7 @@ library(car)
 ```
 
 ```{r set-up-data-using-here-package}
+#read in the data 
 fishdata <- read_csv(here::here("data", "ntl6_v12.csv"))
 ```
 
@@ -31,10 +33,14 @@ Biological: The null hypothesis will be "fish length does not predict fish weigh
 2. Create a visualization of the missing data for the filtered data set containing the observations you will use and also write an accompanying caption explaining how/if the missing data is relevant to your hypotheses. 
 
 ```{r filtering-data-set}
-fish_summary <- subset(fishdata, select = c(length, weight))
+#create a subset of the data to only include length and weight 
+fish_summary <- fishdata %>% 
+  filter(spname == "TROUTPERCH") %>% 
+  select(length, weight)
 ```
 
 ```{r visualize-missing-data}
+#visualize the missing data
 gg_miss_var(fish_summary)
 ```
 
@@ -42,10 +48,12 @@ The missing data shown from the gg_miss_var plot highlights a substantial amount
 
 3. Run your test (Linear regression test)
 ```{r}
+#perform a linear regression test 
 fishlinearregression <- lm(weight~length, data= fish_summary)
 
-# makes the viewer pane show a 2x2 grid of plots
+# makes the viewer pane show a 2x2 grid of plots 
 # format: par(mfrow = c(number of rows, number of columns))
+#display the diagnostic tests
 par(mfrow = c(2, 2))
 plot(fishlinearregression)
 ```
@@ -61,6 +69,7 @@ plot 4--Residual vs Leverage: The residual vs leverage plot highlights some outl
 
 6.
 ```{r results-summary}
+#create a summary of the linear regression stats
 model_summary <- summary(fishlinearregression)
 
 model_summary
@@ -68,6 +77,7 @@ model_summary
 
 7. 
 ```{r Anova-summary}
+#perform an ANOVA test
 model_squares <- anova(fishlinearregression)
 
 model_squares
@@ -75,6 +85,7 @@ model_squares
 
 
 ```{r}
+#clean up the ANOVA summary table 
 model_squares_table <- tidy(model_squares) %>% 
   mutate(across(sumsq:meansq,~round(.x, digits = 5))) %>% 
   mutate(statistic = round(statistic, digits = 1)) %>% 
@@ -96,7 +107,7 @@ model_squares_table
 
 8. In 1-2 sentences, describe how the ANOVA table relates to the information you get from the summary() object. 
 
-The ANOVA table relates to the information you get from the summary object because both report f-statistic, the degrees of freedom, and the p-value. 
+The ANOVA table relates to the information you get from the summary object because both report the f-statistic, the degrees of freedom, and the p-value. 
 
 9. In 2-3 sentences, summarize your results in prose with in-text references to test results. Include all relevant information.
 
