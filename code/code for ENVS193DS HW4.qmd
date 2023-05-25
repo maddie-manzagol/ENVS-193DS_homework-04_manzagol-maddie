@@ -3,6 +3,9 @@ title: "code for ENVS193DS HW4"
 author: Maddie Manzagol 
 data: May 20, 2023
 format: docx
+execute:
+  message: false
+  warning: false 
 ---
 #Question: How does fish length predict fish weight for trout perch (across all sample years)? 
 ```{r loading-in-packages}
@@ -58,13 +61,18 @@ par(mfrow = c(2, 2))
 plot(fishlinearregression)
 ```
 
-plot 1--Residual vs Fitted: The residual vs fitted plot generated from "fishlinearregression" shows residuals that are not evenly and randomly distributed around the horizontal dotted line. Therefore, the assumption of homoscedasticity is violated. 
+```{r}
+check_normality(fishlinearregression)
+check_heteroscedasticity(fishlinearregression)
+```
 
-plot 2--Normal QQ: The normal QQ plot shows residuals that are not entirely linearly distributed, meaning the points do not follow a straight line. There is a portion distributed between quantiles -2 to 2 that follow a very linear line but after quantile 2 the slope changes. 
+plot 1--Residual vs Fitted: The residual vs fitted plot generated from "fishlinearregression" shows residuals that are relatively evenly and randomly distributed around the horizontal dotted line but not entirely even and random because most residuals are clumped in the center with a few outliers. Therefore, the assumption of homoscedasticity is violated. 
 
-plot 3--Scale-Location: The scale-location plot highlights that the square root of residuals does not highlight an even and random spread around the red line. This means that the variances change and homoscedasticity is violated. 
+plot 2--Normal QQ: The normal QQ plot shows residuals that are not entirely linearly distributed, meaning the all of the points in total do not constitute a straight line. There is a portion distributed between quantiles -2 to 2 that follow a very linear line but after quantile 2 and before quantile -2 the slope positively increases. 
 
-plot 4--Residual vs Leverage: The residual vs leverage plot highlights some outliers (labeled) indicating that there are data points that are influencing the model. This means that if the model was calculated without these labeled outliers, then the model would predict a different estimate. 
+plot 3--Scale-Location: The scale-location plot highlights that the square root of residuals does not highlight an even and random spread around the red line--points are clumped in the middle with outliers. This means that the variances change and homoscedasticity is violated. 
+
+plot 4--Residual vs Leverage: The residual vs leverage plot highlights some outliers (labeled) both inside and outside of the dashed lines indicating that there are data points that are influencing the model. This means that if the model was calculated without these labeled outliers, then the model would predict a different estimate. 
 
 
 6.
@@ -111,7 +119,7 @@ The ANOVA table relates to the information you get from the summary object becau
 
 9. In 2-3 sentences, summarize your results in prose with in-text references to test results. Include all relevant information.
 
-Given that we hypothesized that fish length would predict fish weights, our null hypothesis was that fish length did not predict fish weight. Fish weight was significantly predicted by differing fish lengths (analysis of variance, F(1, 91,088) = 136,700.2, p < 0.001,𝞪= 0.05).
+Given that we hypothesized that fish length would predict fish weights, our null hypothesis was that fish length did not predict fish weight. However, our statistical results show that fish weight was significantly predicted by differing fish lengths (analysis of variance, F(1, 288) = 1,280.8, p < 0.001,𝞪= 0.05).
 
 
 
@@ -144,7 +152,7 @@ plot_predictions <- ggplot(data = fish_summary,
 plot_predictions
 ```
 
-a. The figure above plot fish weight prediction as a function of fish length using data collected about perch trout located in the North Temperate Lakes from 1981 to present day. The data points represent the predicted fish weight given a fish length; meanwhile, the blue line indicates the overall trendline for the predicted correlation between fish length and fish weight. 
+a. The figure above plot fish weight prediction as a function of fish length using data collected about perch trout located in the North Temperate Lakes from 1981 to present day. The data points represent the predicted fish weight given a fish length; meanwhile, the blue line indicates the overall trendline for the predicted correlation between fish length and fish weight. The grey ribbon encompassing the blue trendline line indicates the confidence interval. 
 
 
 
